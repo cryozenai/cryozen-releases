@@ -1,23 +1,23 @@
 services:
   cryozen:
-    image: ghcr.io/shreejitverma/cryozen:latest
+    image: ghcr.io/cryozenai/cryozen:latest
     ports:
       - "${APP_BIND:-127.0.0.1}:${APP_PORT:-7000}:7000"
     volumes:
       - ./data:/app/data:z
       - ./logs:/app/logs:z
-      # Shakti remote-server SSH identity. CryoZen can generate a key here;
+      # Compute remote-server SSH identity. CryoZen can generate a key here;
       # add the shown public key to each remote server's authorized_keys.
       - ./data/ssh:/app/.ssh:z
-      # Shakti local model cache. Inside Docker, "Local" means the CryoZen
+      # Compute local model cache. Inside Docker, "Local" means the CryoZen
       # container, so persist its HuggingFace cache under ./data/huggingface.
       - ./data/huggingface:/app/.cache/huggingface:z
-      # Shakti-installed Python CLIs/packages (vLLM, llama-cpp-python, etc.)
+      # Compute-installed Python CLIs/packages (vLLM, llama-cpp-python, etc.)
       # land under /app/.local for the cryozen user. Persist them so a
       # container recreate does not silently remove installed serve engines.
       - ./data/local:/app/.local:z
     extra_hosts:
-      # Lets the container reach local yantra on the Docker host, including
+      # Lets the container reach local services on the Docker host, including
       # Ollama at http://host.docker.internal:11434.
       - "host.docker.internal:host-gateway"
     environment:
@@ -52,6 +52,8 @@ services:
       - CLEANUP_INTERVAL_HOURS=${CLEANUP_INTERVAL_HOURS:-24}
       - CRYOZEN_INPROCESS_POLLERS=${CRYOZEN_INPROCESS_POLLERS:-1}
       - CRYOZEN_INPROCESS_TASKS=${CRYOZEN_INPROCESS_TASKS:-1}
+      - CRYOZEN_BACKUP_KEEP=${CRYOZEN_BACKUP_KEEP:-7}
+      - CRYOZEN_BACKUP_DIR=${CRYOZEN_BACKUP_DIR:-}
       - CRYOZEN_SCRIPT_HOST=${CRYOZEN_SCRIPT_HOST:-localhost}
       - DATA_BRAVE_API_KEY=${DATA_BRAVE_API_KEY:-}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
